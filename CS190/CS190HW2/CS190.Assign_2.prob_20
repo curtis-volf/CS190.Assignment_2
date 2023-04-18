@@ -1,0 +1,81 @@
+﻿// See https://aka.ms/new-console-template for more information
+
+
+using System;
+using System.Data;
+using Npgsql;
+
+
+class Problems
+{
+    static void Main(string[] args)
+    {
+        // Connect to a PostgreSQL database
+        NpgsqlConnection conn = new NpgsqlConnection("Server=127.0.0.1:5432;User Id=postgres; " +
+           "Password=#Tigger96!;Database=prods;");
+        conn.Open();
+
+        // Define a query returning a single row result set
+        NpgsqlCommand command = new NpgsqlCommand("SELECT * FROM product", conn);
+
+        // Execute the query and obtain the value of the first column of the first row
+        //Int64 count = (Int64)command.ExecuteScalar();
+        NpgsqlDataReader reader = command.ExecuteReader();
+
+        DataTable dt = new DataTable();
+        dt.Load(reader);
+
+        // Define a query returning a single row result set
+        NpgsqlCommand command1 = new NpgsqlCommand("SELECT * FROM customer", conn);
+
+        // Execute the query and obtain the value of the first column of the first row
+        //Int64 count = (Int64)command.ExecuteScalar();
+        NpgsqlDataReader reader1 = command1.ExecuteReader();
+
+        DataTable dt1 = new DataTable();
+        dt1.Load(reader1);
+
+        question_20(dt1);
+
+        conn.Close();
+    }
+    
+
+    static void question_20(DataTable data)
+    {
+        Console.WriteLine();
+
+
+        Dictionary<string, decimal> customerBalances = new Dictionary<string, decimal>();
+
+
+        Console.WriteLine("rep_id    Total_balence");
+
+        Console.WriteLine();
+
+        foreach (DataRow dataRow in data.Rows)
+        {
+            if (customerBalances.ContainsKey(dataRow.Field<string>("rep_id")))
+            {
+                customerBalances[dataRow.Field<string>("rep_id")] = customerBalances[dataRow.Field<string>("rep_id")] + dataRow.Field<decimal>("cust_balance");
+
+            }
+            else
+            {
+                customerBalances.Add(dataRow.Field<string>("rep_id"), dataRow.Field<decimal>("cust_balance"));
+            }
+
+        }
+
+
+
+        foreach (var result in customerBalances)
+        {
+            if (result.Value > 12000)
+            {
+                Console.WriteLine(result.Key + " \t  " + result.Value);
+            }
+        }
+    }
+
+}
